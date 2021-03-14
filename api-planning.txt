@@ -1,0 +1,21 @@
+Standard API
+
+{root-api}/{version}/{grouping}/{endpoint}
+sample: 
+http://mern-api.kabayancoding.com/v1/auth/login
+
+GROUP: Authentication
+
+[1] Register
+{root-api}/{version}/auth/register
+
+
+
+[2] Login
+
+GROUP: Blog
+
+[1] Create Blog Post
+[2] Get Blog Post
+[3] Update Blog Post
+[4] Delete Blog Post

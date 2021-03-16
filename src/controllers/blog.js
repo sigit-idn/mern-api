@@ -62,3 +62,45 @@ exports.getPostById = (req, res, next) => {
   })
   .catch(err => next(err))
 }
+
+exports.updateBlogPost = (req,res, next) => {
+  console.log("ok");
+  const errors = validationResult(req)
+  const { title, content } = req.body;
+  const image = req.file.path
+  const postId = req.params.postId
+  
+  if (!errors.isEmpty()) {
+    const err = new Error("Invalid value input tidak sesuai");
+    err.errorStatus = 400;
+    err.data = errors.array();
+    throw err;
+  }
+  
+  if (!image) {
+    const err = new Error("Please upload an image");
+    err.errorStatus = 422;
+    throw err;
+  }
+
+  BlogPost.findById(postId).then(post =>{
+    if (!post) {
+      const err = new Error('Blog post is not found')
+      err.status = 404;
+      throw err;
+    }
+
+    post.title = title || post.title;
+    post.content = content || post.content;
+    post.image = image || post.image;
+
+    return post.save()
+  })
+.then(data => 
+  res.status(200).json({message: "Blog post updated successfullt", data})
+)
+.catch(err => console.log("Gagal! " + err))
+.finally(() => next())
+
+
+}

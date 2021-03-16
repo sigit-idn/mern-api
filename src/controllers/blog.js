@@ -47,3 +47,18 @@ exports.getAllPosts = (req, res, next) => {
   })
   .catch(err => next(err))
 }
+
+exports.getPostById = (req, res, next) => {
+  BlogPost.findById(req.params.postId).then(result => {
+    if (!result) {
+      const err = new Error('Data is not found')
+      err.errorStatus= 404
+      throw error
+    }
+    res.status(200).json({
+      message : "Blog loaded successfully",
+      data    : result
+    })
+  })
+  .catch(err => next(err))
+}

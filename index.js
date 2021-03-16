@@ -1,6 +1,6 @@
 const bodyParser = require("body-parser");
 const express = require("express");
-const { connect } = require("mongodb");
+const path = require('path')
 const { diskStorage } = require("multer");
 const multer = require("multer");
 const authRouter = require("./src/routes/auth");
@@ -38,6 +38,8 @@ server.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
   next();
 });
+
+server.use('/images', express.static(path.join(__dirname, 'images')))
 
 server.use("/v1/auth", authRouter);
 server.use("/v1/blog", require("./src/routes/blog"));

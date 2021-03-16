@@ -37,3 +37,13 @@ exports.createBlog = (req, res, next) => {
   })).catch(err => console.log(`Error: ` + err)).finally(() => next())
 
 };
+
+exports.getAllPosts = (req, res, next) => {
+  BlogPost.find().then(result => {
+    res.status(200).json({
+      message : "Blog loaded successfully",
+      data    : result
+    })
+  })
+  .catch(err => next(err))
+}

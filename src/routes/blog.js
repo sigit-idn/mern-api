@@ -1,6 +1,6 @@
 const { body } = require("express-validator");
 const express = require("express");
-const { createBlog } = require("../controllers/blog");
+const { createBlog, getAllPosts } = require("../controllers/blog");
 const router = express.Router();
 
 router.post(
@@ -13,5 +13,7 @@ router.post(
   ],
   createBlog
 );
+
+router.get('/posts', getAllPosts)
 
 module.exports = router;

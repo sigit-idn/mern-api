@@ -1,12 +1,33 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const { connect } = require("mongodb");
+const { diskStorage } = require("multer");
+const multer = require("multer");
+const authRouter = require("./src/routes/auth");
 
 const server = express();
 
-const authRouter = require("./src/routes/auth");
+const fileStorage = diskStorage({
+  destination : (req, file, callback) => {
+    callback(null, 'images')
+  },
+
+  filename : (req, file, callback) => {
+    callback(null, new Date().getTime() + "-" + file.originalname)
+  }
+})
+
+const fileFilter = (req, file, callback) => {
+  if (file.mimetype === 'image/png' || file.mimetype ==='image/jpg' || file.mimetype ==='image/jpeg') {
+    callback(null, true)
+  }else {
+    callback(null, false)
+  }
+}
 
 server.use(bodyParser.json());
+server.use(multer({storage : fileStorage, fileFilter}).single('image'))
+
 
 server.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -23,6 +44,7 @@ server.use("/v1/blog", require("./src/routes/blog"));
 server.use((error, req, res, next) => {
   const status = error.errorStatus || 500;
   const { message, data } = error;
+  console.log("salah " + error);
   res.status(status).json({ message, data });
 });
 

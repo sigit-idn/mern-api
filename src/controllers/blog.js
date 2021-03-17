@@ -41,13 +41,28 @@ exports.createBlog = (req, res, next) => {
 };
 
 exports.getAllPosts = (req, res, next) => {
-  BlogPost.find().then(data => {
+  const currentPage = req.query.page || 1;
+  const perPage     = req.query.perPage || 6;
+  let totalItems;
+
+  BlogPost.find()
+  .countDocuments()
+  .then( count => {
+    totalItems = count
+    return BlogPost.find()
+    .skip((parseInt(currentPage) - 1) * parseInt(perPage))
+    .limit(parseInt(perPage))
+  })
+  .then(data => {
     res.status(200).json({
       message : "Blog loaded successfully",
-      data 
+      data,
+      total_data : totalItems,
+      per_page : parseInt(perPage),
+      current_page : parseInt(currentPage)
     })
   })
-  .catch(err => next(err))
+  .catch(error => console.log(error))
 }
 
 exports.getPostById = (req, res, next) => {
@@ -106,17 +121,17 @@ exports.updateBlogPost = (req,res, next) => {
 
 exports.deleteBlogPost = (req, res, next) => {
   BlogPost.findById(req.params.postId)
-  .then(data => {
-    if (!data) {
+  .then(result => {
+    if (!result) {
       const err = new Error('Post not found')
       err.status = 404;
       throw err
     }
 
-    removeImage(data.image)
-    BlogPost.findByIdAndRemove(req.params.postId)
-    res.status(200).json({message : "Post deleted successfully", data})
-  }).catch(err => next(err))}
+    removeImage(result.image)
+    return BlogPost.findByIdAndRemove(req.params.postId)
+  }).then(data => res.status(200).json({message : "Post deleted successfully", data}))
+  .catch(err => next(err))}
 
   const removeImage = filePath => 
     fs.unlink(path.join(__dirname, '../..', filePath), err => console.log(err))

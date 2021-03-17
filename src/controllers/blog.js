@@ -31,33 +31,33 @@ exports.createBlog = (req, res, next) => {
       },
   })
 
- Posting.save().then(result => res.status(201).json({
+ Posting.save().then(data => res.status(201).json({
     message : "Blog Created Successfully",
-    data    : result
+    data
   })).catch(err => console.log(`Error: ` + err)).finally(() => next())
 
 };
 
 exports.getAllPosts = (req, res, next) => {
-  BlogPost.find().then(result => {
+  BlogPost.find().then(data => {
     res.status(200).json({
       message : "Blog loaded successfully",
-      data    : result
+      data 
     })
   })
   .catch(err => next(err))
 }
 
 exports.getPostById = (req, res, next) => {
-  BlogPost.findById(req.params.postId).then(result => {
-    if (!result) {
+  BlogPost.findById(req.params.postId).then(data => {
+    if (!data) {
       const err = new Error('Data is not found')
       err.errorStatus= 404
       throw error
     }
     res.status(200).json({
       message : "Blog loaded successfully",
-      data    : result
+      data
     })
   })
   .catch(err => next(err))
@@ -101,6 +101,9 @@ exports.updateBlogPost = (req,res, next) => {
 )
 .catch(err => console.log("Gagal! " + err))
 .finally(() => next())
+}
 
-
+exports.deleteBlogPost = (req, res, next) => {
+  BlogPost.deleteOne({_id : req.params.postId})
+  .then(data => res.status(200).json({message : "Post deleted successfully", data}))
 }

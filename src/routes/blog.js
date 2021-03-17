@@ -1,6 +1,6 @@
 const { body } = require("express-validator");
 const express = require("express");
-const { createBlog, getAllPosts, getPostById, updateBlogPost } = require("../controllers/blog");
+const { createBlog, getAllPosts, getPostById, updateBlogPost, deleteBlogPost } = require("../controllers/blog");
 const router = express.Router();
 const validation = [
   body("title").isLength({ min: 5 }).withMessage("Minimal 5 karakter"),
@@ -20,5 +20,7 @@ router.get('/posts', getAllPosts);
 router.get('/post/:postId', getPostById)
 
 router.put('/post/:postId', validation, updateBlogPost)
+
+router.delete('/delete/:postId', deleteBlogPost)
 
 module.exports = router;

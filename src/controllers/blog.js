@@ -1,6 +1,8 @@
 const { connect } = require("mongoose");
 const BlogPost = require('../models/blog');
-const {validationResult} = require('express-validator')
+const {validationResult} = require('express-validator');
+const path = require('path');
+const fs = require('fs')
 
 connect(
   "mongodb+srv://sigit:9IKqr3WR2FSMt8kZ@cluster0.b3oi5.mongodb.net/blog?retryWrites=true&w=majority"
@@ -97,13 +99,24 @@ exports.updateBlogPost = (req,res, next) => {
     return post.save()
   })
 .then(data => 
-  res.status(200).json({message: "Blog post updated successfullt", data})
+  res.status(200).json({message: "Blog post updated successfully", data})
 )
-.catch(err => console.log("Gagal! " + err))
-.finally(() => next())
+.catch(err => next(err))
 }
 
 exports.deleteBlogPost = (req, res, next) => {
-  BlogPost.deleteOne({_id : req.params.postId})
-  .then(data => res.status(200).json({message : "Post deleted successfully", data}))
-}
+  BlogPost.findById(req.params.postId)
+  .then(data => {
+    if (!data) {
+      const err = new Error('Post not found')
+      err.status = 404;
+      throw err
+    }
+
+    removeImage(data.image)
+    BlogPost.findByIdAndRemove(req.params.postId)
+    res.status(200).json({message : "Post deleted successfully", data})
+  }).catch(err => next(err))}
+
+  const removeImage = filePath => 
+    fs.unlink(path.join(__dirname, '../..', filePath), err => console.log(err))
